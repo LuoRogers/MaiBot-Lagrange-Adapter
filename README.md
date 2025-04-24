@@ -50,49 +50,6 @@ level = "INFO" # 日志等级（DEBUG, INFO, WARNING, ERROR）
 
 至于requirements，需要maim_message，安装略
 
-# 消息流转过程
-
-```mermaid
-sequenceDiagram
-    participant Lagrange as Lagrange客户端
-    participant Adapter as MaiBot-Lagrange适配器
-    participant Queue as 消息队列
-    participant Handler as 消息处理器
-    participant MaiBot as MaiBot服务
-
-    Note over ,MaiBot: 初始化阶段
-    Lagrange->>Adapter: WebSocket连接(ws://localhost:8095)
-    Adapter->>MaiBot: WebSocket连接(ws://localhost:8000)
-    
-    Note over Lagrange,MaiBot: 心跳检测
-    loop 每30秒
-        Lagrange->>Adapter: 发送心跳包
-        Adapter->>Lagrange: 心跳响应
-    end
-
-    Note over Lagrange,MaiBot: 消息处理流程
-    Lagrange->>Adapter: 发送消息
-    Adapter->>Queue: 消息入队(message_queue)
-    Queue->>Handler: 消息出队处理
-    Handler->>Handler: 解析消息类型
-    alt 文本消息
-        Handler->>MaiBot: 发送文本消息
-    else 图片消息
-        Handler->>MaiBot: 发送图片消息
-    else 混合消息
-        Handler->>MaiBot: 发送混合消息
-    else 转发消息
-        Handler->>MaiBot: 发送转发消息
-    end
-    MaiBot-->>Adapter: 消息响应
-    Adapter-->>Lagrange: 消息响应
-
-    Note over Lagrange,MaiBot: 优雅关闭
-    Adapter->>MaiBot: 关闭连接
-    Adapter->>Queue: 清空消息队列
-    Adapter->>Lagrange: 关闭连接
-```
-
 
 # TO DO List
 - [x] 读取自动心跳测试连接
