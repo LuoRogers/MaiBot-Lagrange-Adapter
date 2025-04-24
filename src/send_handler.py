@@ -51,8 +51,8 @@ class SendHandler:
             else:
                 logger.error("无法识别的消息类型")
                 return
-            logger.info("尝试发送到napcat")
-            response = await self.send_message_to_napcat(
+            logger.info("尝试发送到Lagrange")
+            response = await self.send_message_to_lagrange(
                 action,
                 {
                     id_name: target_id,
@@ -62,7 +62,7 @@ class SendHandler:
             if response.get("status") == "ok":
                 logger.info("消息发送成功")
             else:
-                logger.warning(f"消息发送失败，napcat返回：{str(response)}")
+                logger.warning(f"消息发送失败，Lagrange返回：{str(response)}")
         else:
             logger.critical("现在暂时不支持解析此回复！")
             return None
@@ -150,7 +150,7 @@ class SendHandler:
             },
         }
 
-    async def send_message_to_napcat(self, action: str, params: dict) -> dict:
+    async def send_message_to_lagrange(self, action: str, params: dict) -> dict:
         request_uuid = str(uuid.uuid4())
         payload = json.dumps({"action": action, "params": params, "echo": request_uuid})
         await self.server_connection.send(payload)

@@ -35,7 +35,7 @@ class RecvHandler:
 
     def __init__(self):
         self.server_connection: Server.ServerConnection = None
-        self.interval = global_config.napcat_heartbeat_interval
+        self.interval = global_config.lagrange_heartbeat_interval
 
     async def handle_meta_event(self, message: dict) -> None:
         event_type = message.get("meta_event_type")
@@ -52,7 +52,7 @@ class RecvHandler:
                 self.interval = message.get("interval") / 1000
             else:
                 self_id = message.get("self_id")
-                logger.warning(f"Bot {self_id} Napcat 端异常！")
+                logger.warning(f"Bot {self_id} Lagrange 端异常！")
 
     async def check_heartbeat(self, id: int) -> None:
         while True:
@@ -66,7 +66,7 @@ class RecvHandler:
 
     async def handle_raw_message(self, raw_message: dict) -> None:
         """
-        从Napcat接受的原始消息处理
+        从Lagrange接受的原始消息处理
 
         Parameters:
             raw_message: dict: 原始消息
@@ -99,6 +99,7 @@ class RecvHandler:
             elif sub_type == MessageType.Private.group:
                 """
                 本部分暂时不做支持，先放着
+                待适配Lagrange
                 """
                 logger.warning("群临时消息类型不支持")
                 return None
@@ -278,7 +279,7 @@ class RecvHandler:
                     payload = json.dumps(
                         {
                             "action": "get_forward_msg",
-                            "params": {"message_id": forward_message_id},
+                            "params": {"id": forward_message_id},# Lagrange这里是id，NapCat是message_id
                             "echo": request_uuid,
                         }
                     )
@@ -301,7 +302,7 @@ class RecvHandler:
                     if not response_data:
                         logger.warning("转发消息内容为空或获取失败")
                         return None
-                    messages = response_data.get("messages")
+                    messages = response_data.get("messages") # Lagrange这里是message，NapCat是messages
                     if not messages:
                         logger.warning("转发消息内容为空或获取失败")
                         return None

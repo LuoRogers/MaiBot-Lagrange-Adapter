@@ -11,7 +11,7 @@ class Config:
     nickname: Optional[str] = None
     server_host: str = "localhost"
     server_port: int = 8095
-    napcat_heartbeat_interval: int = 30
+    lagrange_heartbeat_interval: int = 30
 
     def __init__(self):
         self._get_config_path()
@@ -23,7 +23,7 @@ class Config:
         self.config_path = os.path.join(self.root_path, "config.toml")
 
     def load_config(self):
-        include_configs = ["Nickname", "Napcat_Server", "MaiBot_Server", "Debug"]
+        include_configs = ["Nickname", "Lagrange_Server", "MaiBot_Server", "Debug"]
         if os.path.exists(self.config_path):
             with open(self.config_path, "rb") as f:
                 try:
@@ -36,13 +36,13 @@ class Config:
                     logger.error(f"配置文件中缺少必需的字段: '{key}'")
                     sys.exit(1)
             self.nickname = raw_config["Nickname"].get("nickname")
-            self.server_host = raw_config["Napcat_Server"].get("host", "localhost")
-            self.server_port = raw_config["Napcat_Server"].get("port", 8095)
+            self.server_host = raw_config["Lagrange_Server"].get("host", "localhost")
+            self.server_port = raw_config["Lagrange_Server"].get("port", 8095)
             self.platform = raw_config["MaiBot_Server"].get("platform_name")
             if not self.platform:
                 logger.critical("请在配置文件中指定平台")
                 sys.exit(1)
-            self.napcat_heartbeat_interval = raw_config["Napcat_Server"].get("heartbeat", 30)
+            self.lagrange_heartbeat_interval = raw_config["Lagrange_Server"].get("heartbeat", 30)
             self.mai_host = raw_config["MaiBot_Server"].get("host", "localhost")
             self.mai_port = raw_config["MaiBot_Server"].get("port", 8000)
             self.debug_level = raw_config["Debug"].get("level", "INFO")

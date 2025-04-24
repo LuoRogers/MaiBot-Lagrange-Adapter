@@ -45,10 +45,10 @@ async def message_process():
 
 async def main():
     recv_handler.maibot_router = router
-    _ = await asyncio.gather(napcat_server(), mmc_start_com(), message_process(), check_timeout_response())
+    _ = await asyncio.gather(lagrange_server(), mmc_start_com(), message_process(), check_timeout_response())
 
 
-async def napcat_server():
+async def lagrange_server():
     logger.info("正在启动adapter...")
     async with Server.serve(message_recv, global_config.server_host, global_config.server_port) as server:
         logger.info(f"Adapter已启动，监听地址: ws://{global_config.server_host}:{global_config.server_port}")
