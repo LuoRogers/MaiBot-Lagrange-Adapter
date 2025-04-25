@@ -302,7 +302,7 @@ class RecvHandler:
                     if not response_data:
                         logger.warning("转发消息内容为空或获取失败")
                         return None
-                    messages = response_data.get("messages") # Lagrange这里是message，NapCat是messages
+                    messages = response_data.get("message") # Lagrange使用message字段
                     if not messages:
                         logger.warning("转发消息内容为空或获取失败")
                         return None
@@ -641,15 +641,19 @@ class RecvHandler:
             return None, 0
         for sub_message in message_list:
             sub_message: dict
-            sender_info: dict = sub_message.get("sender")
-            user_nickname: str = sender_info.get("nickname", "QQ用户")
+            if not isinstance(sub_message, dict):
+                continue
+            if sub_message.get("type") != "node":
+                continue
+            data = sub_message.get("data", {})
+            user_nickname: str = data.get("nickname", "QQ用户")
             user_nickname_str = f"【{user_nickname}】:"
             break_seg = Seg(type="text", data="\n")
-            message_of_sub_message_list: dict = sub_message.get("message")
-            if not message_of_sub_message_list:
+            content = data.get("content", [])
+            if not content:
                 logger.warning("转发消息内容为空")
                 continue
-            message_of_sub_message = message_of_sub_message_list[0]
+            message_of_sub_message = content[0]
             if message_of_sub_message.get("type") == RealMessageType.forward:
                 if layer >= 3:
                     full_seg_data = (
@@ -663,7 +667,7 @@ class RecvHandler:
                     sub_message_data = message_of_sub_message.get("data")
                     if not sub_message_data:
                         continue
-                    contents = sub_message_data.get("content")
+                    contents = sub_message_data.get("content", [])
                     seg_data, count = await self._handle_forward_message(contents, layer + 1)
                     image_count += count
                     head_tip = Seg(
